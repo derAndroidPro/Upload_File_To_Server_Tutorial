@@ -1,7 +1,7 @@
 # Datei mit Android App auf Server hochladen
 So ladet ihr mit eurer Android App eine Datei, z.B. ein Bild, auf eurem Server hoch, welcher dann wiederum den Link des Bildes an die App zurücksendet.
 
-- <a href="" target="_blank" >Tutorial auf YouTube</a>
+- <a href="https://youtu.be/x9lzmFfnjKI" target="_blank" >Teil 1: Tutorial auf YouTube</a>
 - Projekt für Android Studio
 
 ---
