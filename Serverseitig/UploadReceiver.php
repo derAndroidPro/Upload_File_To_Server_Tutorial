@@ -19,7 +19,7 @@ if($temp_name != "" && exif_imagetype($temp_name) != false && $filesize <= 10485
 		echo utf8_encode("Datei konnte auf dem Server nicht gespeichert werden. Bitte erneut versuchen!");
 	}
 } else {
-	echo utf8_encode("Kein (echtes) Bild erhalten. (Maximale Dateigröße: 10MB");
+	echo utf8_encode("Kein (echtes) Bild erhalten. (Maximale DateigrÃ¶ÃŸe: 10MB)");
 }
 
 ?>
