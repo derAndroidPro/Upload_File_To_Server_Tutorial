@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 URL uploadUrl = new URL(uploadUrlString);
                 HttpURLConnection connection = (HttpURLConnection) uploadUrl.openConnection();
                 connection.setDoOutput(true);
-                connection.setDoOutput(true);
+                connection.setDoInput(true);
                 connection.setRequestProperty("Content-Type", "multipart/form-data; boundary="+boundary);
                 connection.setRequestProperty("Connection", "Keep-Alive");
                 connection.setFixedLengthStreamingMode(uploadSize);
