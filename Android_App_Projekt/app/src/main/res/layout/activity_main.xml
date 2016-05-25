@@ -43,6 +43,9 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:id="@+id/textView"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:autoLink="web"
+        android:textIsSelectable="true"
+        />
 
 </RelativeLayout>

@@ -1,9 +1,13 @@
 package de.derandroidpro.uploadimagetoservertutorial;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.Image;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -12,8 +16,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -27,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     final int EXTERNAL_STORAGE_PERMISSION_REQ_CODE = 14;
 
     Uri imageUri;
+
+    ProgressDialog uploadDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +69,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             }
             case R.id.button_upload:{
-
+                if(imageUri!= null && internetAvailable()) {
+                    uploadDialog = new ProgressDialog(MainActivity.this);
+                    uploadDialog.setTitle("Bild wird hochgeladen...");
+                    uploadDialog.setMessage("Bitte warten.");
+                    uploadDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                    uploadDialog.show();
+                    new UploadImageAsyncTask().execute(null);
+                }
                 break;
             }
         }
@@ -81,6 +104,103 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             imageView.setImageURI(data.getData());
             imageUri = data.getData();
             btn_upload.setVisibility(View.VISIBLE);
+            tv_link.setText(null);
         }
     }
+
+    private class UploadImageAsyncTask extends AsyncTask{
+
+        String serverResponse;
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+
+            String boundary = "---boundary"+System.currentTimeMillis();
+            String firstLineBoundary = "--"+boundary+"\r\n";
+            String contentDisposition = "Content-Disposition: form-data;name=\"fileupload1\";filename=\"imagefile.jpg\"\r\n";
+            String newLine = "\r\n";
+            String lastLineBoundary = "--"+boundary+"--\r\n";
+
+            try {
+                InputStream imageInputStream = getContentResolver().openInputStream(imageUri);
+                int uploadSize = (firstLineBoundary+contentDisposition+newLine+newLine+lastLineBoundary).getBytes().length + imageInputStream.available();
+                uploadDialog.setMax(uploadSize);
+
+
+                URL uploadUrl = new URL(uploadUrlString);
+                HttpURLConnection connection = (HttpURLConnection) uploadUrl.openConnection();
+                connection.setDoOutput(true);
+                connection.setDoOutput(true);
+                connection.setRequestProperty("Content-Type", "multipart/form-data; boundary="+boundary);
+                connection.setRequestProperty("Connection", "Keep-Alive");
+                connection.setFixedLengthStreamingMode(uploadSize);
+
+                DataOutputStream dataOutputStream = new DataOutputStream(connection.getOutputStream());
+                dataOutputStream.writeBytes(firstLineBoundary);
+                dataOutputStream.writeBytes(contentDisposition);
+                dataOutputStream.writeBytes(newLine);
+
+                int byteCounter = 0;
+
+                byte[] buffer = new byte[1024];
+                int read;
+                while ((read = imageInputStream.read(buffer)) != -1){
+                    dataOutputStream.write(buffer, 0, read);
+                    byteCounter+=1024;
+                    uploadDialog.setProgress(byteCounter);
+                }
+
+                dataOutputStream.writeBytes(newLine);
+                dataOutputStream.writeBytes(lastLineBoundary);
+                dataOutputStream.flush();
+                dataOutputStream.close();
+
+                serverResponse = getTextFromInputStream(connection.getInputStream());
+                connection.getInputStream().close();
+                connection.disconnect();
+
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                Toast.makeText(MainActivity.this, "Es ist ein Fehler aufgetreten! Bitte erneut versuchen!", Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(MainActivity.this, "Es ist ein Fehler aufgetreten! Bitte erneut versuchen!", Toast.LENGTH_SHORT).show();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            imageView.setImageDrawable(null);
+            btn_upload.setVisibility(View.INVISIBLE);
+            tv_link.setText(serverResponse);
+            uploadDialog.dismiss();
+            super.onPostExecute(o);
+        }
+    }
+
+    public String getTextFromInputStream(InputStream is){
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder stringBuilder = new StringBuilder();
+        String aktuelleZeile;
+        try {
+            while ((aktuelleZeile = reader.readLine()) != null){
+                stringBuilder.append(aktuelleZeile);
+                stringBuilder.append("\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return stringBuilder.toString().trim();
+    }
+
+    private boolean internetAvailable(){
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
+    }
+
+
 }
