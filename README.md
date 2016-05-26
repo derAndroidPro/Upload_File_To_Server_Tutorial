@@ -2,6 +2,7 @@
 So ladet ihr mit eurer Android App eine Datei, z.B. ein Bild, auf eurem Server hoch, welcher dann wiederum den Link des Bildes an die App zurücksendet.
 
 - <a href="https://youtu.be/x9lzmFfnjKI" target="_blank" >Teil 1: Tutorial auf YouTube</a>
+- <a href="https://youtu.be/-1535u8mFZY" target="_blank" >Teil 2: Tutorial auf YouTube</a>
 - Projekt für Android Studio
 
 ---
@@ -15,7 +16,12 @@ Wichtige Dateien:
 
 <b>SCREENSHOTS</b>
 
-<img src="https://github.com/derAndroidPro/Upload_File_To_Server_Tutorial/blob/master/Screenshot_20160522-004432.png" height="500px" />
+<img src="https://github.com/derAndroidPro/Upload_File_To_Server_Tutorial/blob/master/Screenshot_20160522-004432.png" height="500px"/>
+<img src="https://github.com/derAndroidPro/Upload_File_To_Server_Tutorial/blob/master/Screenshot_20160525-145429.png" height="500px"/>
+
+
+<img src="https://github.com/derAndroidPro/Upload_File_To_Server_Tutorial/blob/master/Screenshot_20160525-145245.png" height="500px"/>
+<img src="https://github.com/derAndroidPro/Upload_File_To_Server_Tutorial/blob/master/Screenshot_20160525-145234.png" height="500px"/>
 
 ---
 
